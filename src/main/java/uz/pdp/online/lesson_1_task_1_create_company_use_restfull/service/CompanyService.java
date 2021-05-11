@@ -24,12 +24,14 @@ public class CompanyService {
         if (exists)
             return new ApiResponse("Bunday tashkilot mavjud", true);
         Company company = new Company();
+        Address address = new Address();
+        address.setStreet(companyDto.getStreet());
+        address.setHomeNumber(companyDto.getHomeNumber());
+        Address savedAddress = addressRepos.save(address);
+        company.setAddress(savedAddress);
+
         company.setCorpName(companyDto.getCorpName());
         company.setDirectorName(companyDto.getDirectorName());
-        Optional<Address> optionalAddress = addressRepos.findById(companyDto.getAddressId());
-        if (!optionalAddress.isPresent())
-            return new ApiResponse("Bunday address topilmadi", false);
-        company.setAddress(optionalAddress.get());
         companyRepos.save(company);
         return new ApiResponse("Ma'lumot saqlandi", true);
     }
@@ -51,13 +53,19 @@ public class CompanyService {
         Optional<Company> optionalCompany = companyRepos.findById(id);
         if (!optionalCompany.isPresent())
             return new ApiResponse("Bunday ma'lumot topilmadi", false);
+        Optional<Address> optionalAddress = addressRepos.findById(companyDto.getAddressId());
+        if (!optionalAddress.isPresent()) {
+            return new ApiResponse("Bunday address topilmadi", false);
+        }
         Company editingCompany = optionalCompany.get();
+        Address editingAddress = optionalAddress.get();
+        editingAddress.setStreet(companyDto.getStreet());
+        editingAddress.setHomeNumber(companyDto.getHomeNumber());
+        Address savedAddress = addressRepos.save(editingAddress);
+
         editingCompany.setCorpName(companyDto.getCorpName());
         editingCompany.setDirectorName(companyDto.getDirectorName());
-        Optional<Address> optionalAddress = addressRepos.findById(companyDto.getAddressId());
-        if (!optionalAddress.isPresent())
-            return new ApiResponse("Bunday address topilmadi", false);
-        editingCompany.setAddress(optionalAddress.get());
+        editingCompany.setAddress(savedAddress);
         companyRepos.save(editingCompany);
         return new ApiResponse("Ma'lumot saqlandi",true);
     }
