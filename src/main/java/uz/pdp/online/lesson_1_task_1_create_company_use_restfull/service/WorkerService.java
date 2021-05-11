@@ -31,13 +31,16 @@ public class WorkerService {
         Optional<Department> optionalDepartment = departmentRepos.findById(workerDto.getDepartmentId());
         if (!optionalDepartment.isPresent())
             return new ApiResponse("Bunday tashkilot topilmadi", false);
-        if (!optionalAddress.isPresent())
-            return new ApiResponse("Bunday manzil topilmadi", false);
+
         Worker worker = new Worker();
+        Address address = new Address();
         worker.setName(workerDto.getName());
         worker.setPhoneNumber(workerDto.getPhoneNumber());
-        worker.setAddress(optionalAddress.get());
         worker.setDepartment(optionalDepartment.get());
+        address.setStreet(workerDto.getStreet());
+        address.setHomeNumber(workerDto.getHomeNumber());
+        Address savedAddress = addressRepos.save(address);
+        worker.setAddress(savedAddress);
         workerRepos.save(worker);
         return new ApiResponse("Ma'lumot saqlandi", true);
     }
@@ -67,9 +70,13 @@ public class WorkerService {
             return new ApiResponse("Bunday manzil topilmadi", false);
 
         Worker editingWorker = optionalWorker.get();
+        Address editingAddress = optionalAddress.get();
+        editingAddress.setStreet(workerDto.getStreet());
+        editingAddress.setHomeNumber(workerDto.getHomeNumber());
+        Address savedAddress = addressRepos.save(editingAddress);
+        editingWorker.setAddress(savedAddress);
         editingWorker.setName(workerDto.getName());
         editingWorker.setPhoneNumber(workerDto.getPhoneNumber());
-        editingWorker.setAddress(optionalAddress.get());
         editingWorker.setDepartment(optionalDepartment.get());
         workerRepos.save(editingWorker);
         return new ApiResponse("Bunday ishchi mavjud emas", true);

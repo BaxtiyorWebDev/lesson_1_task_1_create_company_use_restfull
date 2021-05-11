@@ -6,6 +6,8 @@ import lombok.Data;
 public class WorkerDto {
     private String name;
     private String phoneNumber;
+    private String street;
+    private String homeNumber;
     private Integer addressId;
     private Integer departmentId;
 }
